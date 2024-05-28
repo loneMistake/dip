@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat</title>
+<style>
+.chat-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.message-box {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+#message-list {
+    max-height: 300px;
+    overflow-y: scroll;
+}
+</style>
+</head>
+<body>
+<div class="chat-container">
+    <div id="message-list"></div>
+    <div class="message-box">
+        <textarea id="message" rows="3" cols="40" placeholder="Введите ваше сообщение"></textarea><br>
+        <button onclick="sendMessage()">Отправить</button>
+    </div>
+</div>
+
+<script>
+// Функция для загрузки сообщений чата
+function loadMessages() {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            document.getElementById("message-list").innerHTML = xhr.responseText;
+        }
+    };
+    xhr.open("POST", "chat.php", true);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send("action=load");
+}
+
+// Функция для отправки сообщений в чат
+function sendMessage() {
+    var message = document.getElementById("message").value;
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            document.getElementById("message-list").innerHTML = xhr.responseText;
+            document.getElementById("message").value = "";
+        }
+    };
+    xhr.open("POST", "chat.php", true);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send("action=send&message=" + message);
+}
+
+// Загрузка сообщений при загрузке страницы
+window.onload = function() {
+    loadMessages();
+    setInterval(function() {
+        loadMessages();
+    }, 5000); // Обновляем сообщения каждые 5 секунд
+};
+</script>
+</body>
+</html>
